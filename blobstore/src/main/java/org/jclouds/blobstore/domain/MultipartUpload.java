@@ -14,29 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.chef;
 
-import java.io.Closeable;
+package org.jclouds.blobstore.domain;
 
-import org.jclouds.View;
-import org.jclouds.chef.internal.ChefContextImpl;
+import com.google.auto.value.AutoValue;
 
-import com.google.inject.ImplementedBy;
+@AutoValue
+public abstract class MultipartUpload {
+   public abstract String containerName();
+   public abstract String blobName();
+   public abstract String id();
+   public abstract BlobMetadata blobMetadata();
 
-/**
- * Provides an entry point to Chef features.
- * 
- * @deprecated Will be removed in next version. Directly create the
- *             {@link ChefApi} instead and access the {@link ChefService} from
- *             it.
- */
-@ImplementedBy(ChefContextImpl.class)
-@Deprecated
-public interface ChefContext extends View, Closeable {
-
-   /**
-    * Provides access to high level Chef features.
-    */
-   ChefService getChefService();
-
+   public static MultipartUpload create(String containerName, String blobName, String id, BlobMetadata blobMetadata) {
+      return new AutoValue_MultipartUpload(containerName, blobName, id, blobMetadata);
+   }
 }
