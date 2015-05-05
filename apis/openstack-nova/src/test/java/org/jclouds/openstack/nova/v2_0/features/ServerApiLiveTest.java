@@ -22,23 +22,25 @@ import com.google.common.collect.Iterables;
 import org.jclouds.http.HttpResponseException;
 import org.jclouds.openstack.nova.v2_0.domain.BlockDeviceMapping;
 import org.jclouds.openstack.nova.v2_0.domain.Network;
+import org.jclouds.openstack.nova.v2_0.domain.SchedulerHints;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
+import static org.jclouds.openstack.nova.v2_0.domain.Server.Status.ACTIVE;
 import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;
 import org.jclouds.openstack.nova.v2_0.extensions.AvailabilityZoneApi;
 import org.jclouds.openstack.nova.v2_0.internal.BaseNovaApiLiveTest;
 import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
 import org.jclouds.openstack.nova.v2_0.options.RebuildServerOptions;
+import static org.jclouds.openstack.nova.v2_0.predicates.ServerPredicates.awaitActive;
 import org.jclouds.openstack.v2_0.domain.Link.Relation;
 import org.jclouds.openstack.v2_0.domain.Resource;
 import org.jclouds.openstack.v2_0.features.ExtensionApi;
 import org.jclouds.openstack.v2_0.predicates.LinkPredicates;
-import org.testng.annotations.Test;
-
-import static org.jclouds.openstack.nova.v2_0.domain.Server.Status.ACTIVE;
-import static org.jclouds.openstack.nova.v2_0.predicates.ServerPredicates.awaitActive;
+import org.jclouds.rest.ResourceNotFoundException;
+import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * Tests behavior of {@link ServerApi}
@@ -46,7 +48,7 @@ import static org.testng.Assert.assertTrue;
 @Test(groups = "live", testName = "ServerApiLiveTest")
 public class ServerApiLiveTest extends BaseNovaApiLiveTest {
 
-   @Test(description = "GET /v${apiVersion}/{tenantId}/servers")
+    @Test(description = "GET /v${apiVersion}/{tenantId}/servers")
    public void testListServers() throws Exception {
       for (String regionId : regions) {
          ServerApi serverApi = api.getServerApi(regionId);
@@ -107,7 +109,7 @@ public class ServerApiLiveTest extends BaseNovaApiLiveTest {
     * In apis/openstack-nova:
     * mvn -Plive clean install "-Dtest.openstack-nova.endpoint=http://localhost:5000/v2.0" "-Dtest.openstack-nova.identity=demo:demo" "-Dtest.openstack-nova.credential=devstack" "-Dtest=org.jclouds.openstack.nova.v2_0.features.ServerApiLiveTest#testCreateWithNetworkOptions"
     */
-   @Test(enabled = false)
+   @Test(enabled = true)
    public void testCreateWithNetworkOptions() {
       String serverId = null;
       for (String regionId : regions) {
@@ -132,7 +134,57 @@ public class ServerApiLiveTest extends BaseNovaApiLiveTest {
       }
    }
 
-   /**
+    /**
+     * This test creates a server with a scheduler hint that sets the server group
+     * used for <a href="http://docs.openstack.org/havana/config-reference/content/scheduler-filters.html#groupaffinityfilter"GroupAffinity</a>
+     * and <a href="http://docs.openstack.org/havana/config-reference/content/scheduler-filters.html#groupantiaffinityfilter"GroupAntiAffinity</a> filters
+     * Openstack specific - needs compute api v2.0 extensions enabled
+     * This test needs a server group to be created
+     * (currently not implemented in jclouds, but available in the openstack nova api v2 extensions)
+     *
+     * This can be tested on devstack:
+     * From apis/openstack-nova:
+     * mvn -Plive clean install "-Dtest.openstack-nova.endpoint=http://localhost:5000/v2.0" "-Dtest.openstack-nova.identity=demo:demo"
+     * "-Dtest.openstack-nova.credential=devstack" "-Dtest.openstack-nova.servergroup=<servergroupuuid>"
+     * "-Dtest=org.jclouds.openstack.nova.v2_0.features.ServerApiLiveTest#testCreateWithSchedulerHintsServerGroup"
+     */
+    @Test
+    public void testCreateWithSchedulerHintsServerGroup() {
+        String serverId = null;
+        String serverGroupUUID = null;
+
+        String testServerGroupProperty = "test." + provider + ".servergroup";
+        if (System.getProperties().containsKey(testServerGroupProperty)) {
+            serverGroupUUID = System.getProperty(testServerGroupProperty);
+        }
+        else {
+            Assert.fail("Test requires system property " + testServerGroupProperty);
+        }
+
+        for (String regionId : regions) {
+            ServerApi serverApi = api.getServerApi(regionId);
+            try {
+                CreateServerOptions options = CreateServerOptions.Builder.schedulerHints
+                        (SchedulerHints.builder().serverGroup(serverGroupUUID).build());
+                ServerCreated server = serverApi.create(hostName, imageId(regionId), "1", options);
+                serverId = server.getId();
+
+                awaitActive(serverApi).apply(server.getId());
+
+                Server serverCheck = serverApi.get(serverId);
+                assertEquals(serverCheck.getStatus(), ACTIVE);
+            }
+            catch (ResourceNotFoundException e) {
+                Assert.fail("Server group " + serverGroupUUID + " was not found - please create the server group via the os-server-groups api", e);
+            } finally {
+                if (serverId != null) {
+                    serverApi.delete(serverId);
+                }
+            }
+        }
+    }
+
+    /**
     * This test creates a new server with a boot device from an image.
     * <p/>
     * This needs to be supported by the provider, and is usually not supported.
