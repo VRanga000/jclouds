@@ -116,6 +116,9 @@ public class NovaComputeServiceAdapter implements
       if (templateOptions.getNetworks() != null) {
          options.networks(templateOptions.getNetworks());
       }
+      if (templateOptions.getSchedulerHints().isPresent()) {
+         options.schedulerHints(templateOptions.getSchedulerHints().get());
+      }
 
       Optional<String> privateKey = Optional.absent();
       if (templateOptions.getKeyPairName() != null) {
