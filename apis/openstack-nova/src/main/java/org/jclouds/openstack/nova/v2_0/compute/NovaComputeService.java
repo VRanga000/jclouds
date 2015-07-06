@@ -35,7 +35,9 @@ import javax.inject.Singleton;
 import org.jclouds.Constants;
 import org.jclouds.collect.Memoized;
 import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.callables.RunScriptOnNode;
+import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.NodeMetadata;
@@ -168,7 +170,7 @@ public class NovaComputeService extends BaseComputeService {
       }
    }
 
-   /**
+  /**
     * returns template options, except of type {@link NovaTemplateOptions}.
     */
    @Override
