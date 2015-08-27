@@ -121,11 +121,12 @@ public class ServerInRegionToNodeMetadataTest {
       NodeMetadata convertedNodeMetadata = converter.apply(serverInRegionToConvert);
 
       assertNotNull(convertedNodeMetadata.getPrivateAddresses());
-      assertEquals(convertedNodeMetadata.getPrivateAddresses(), ImmutableSet.of("10.176.42.16"));
+      assertEquals(convertedNodeMetadata.getPrivateAddresses(), ImmutableSet.of("10.176.42.16", "fd00::1:ff4e:3e:9:e"));
 
       assertNotNull(convertedNodeMetadata.getPublicAddresses());
       // note jclouds doesn't yet support ipv6 b/c not tested yet
-      assertEquals(convertedNodeMetadata.getPublicAddresses(), ImmutableSet.of("67.23.10.132", "67.23.10.131"));
+      assertEquals(convertedNodeMetadata.getPublicAddresses(), ImmutableSet.of("67.23.10.132", "67.23.10.131",
+              "::babe:67.23.10.132", "::babe:4317:0A83"));
    }
 
    @Test
@@ -155,11 +156,12 @@ public class ServerInRegionToNodeMetadataTest {
       NodeMetadata convertedNodeMetadata = converter.apply(serverInRegionToConvert);
 
       assertNotNull(convertedNodeMetadata.getPrivateAddresses());
-      assertEquals(convertedNodeMetadata.getPrivateAddresses(), ImmutableSet.of("10.176.42.16"));
+      assertEquals(convertedNodeMetadata.getPrivateAddresses(), ImmutableSet.of("10.176.42.16", "fd00::1:ff4e:3e:9:e"));
 
       assertNotNull(convertedNodeMetadata.getPublicAddresses());
       // note jclouds doesn't yet support ipv6 b/c not tested yet
-      assertEquals(convertedNodeMetadata.getPublicAddresses(), ImmutableSet.of("67.23.10.132", "67.23.10.131"));
+      assertEquals(convertedNodeMetadata.getPublicAddresses(), ImmutableSet.of("::babe:67.23.10.132",
+              "::babe:4317:0A83", "67.23.10.132", "67.23.10.131"));
    }
 
    @Test
@@ -189,11 +191,15 @@ public class ServerInRegionToNodeMetadataTest {
       NodeMetadata convertedNodeMetadata = converter.apply(serverInRegionToConvert);
 
       assertNotNull(convertedNodeMetadata.getPrivateAddresses());
-      assertEquals(convertedNodeMetadata.getPrivateAddresses(), ImmutableSet.of("10.176.42.16"));
+      assertEquals(convertedNodeMetadata.getPrivateAddresses(), ImmutableSet.of("10.176.42.16", "fd00::1:ff4e:3e:9:e"));
 
       assertNotNull(convertedNodeMetadata.getPublicAddresses());
       // note jclouds doesn't yet support ipv6 b/c not tested yet
-      assertEquals(convertedNodeMetadata.getPublicAddresses(), ImmutableSet.of("67.23.10.132", "67.23.10.131", "76.32.1.231"));
+       //it does now! - vr
+      assertEquals(convertedNodeMetadata.getPublicAddresses(), ImmutableSet.of(
+              "76.32.1.231", "::babe:4317:0A83", "::babe:76.32.1.231",
+              "67.23.10.131", "67.23.10.132", "::babe:67.23.10.132"));
+
    }
 
    @Test
@@ -264,11 +270,12 @@ public class ServerInRegionToNodeMetadataTest {
                convertedNodeMetadata.getStatus());
 
       assertNotNull(convertedNodeMetadata.getPrivateAddresses());
-      assertEquals(convertedNodeMetadata.getPrivateAddresses(), ImmutableSet.of("10.176.42.16"));
+      assertEquals(convertedNodeMetadata.getPrivateAddresses(), ImmutableSet.of("10.176.42.16", "fd00::1:ff4e:3e:9:e"));
 
       assertNotNull(convertedNodeMetadata.getPublicAddresses());
       // note jclouds doesn't yet support ipv6 b/c not tested yet
-      assertEquals(convertedNodeMetadata.getPublicAddresses(), ImmutableSet.of("67.23.10.132", "67.23.10.131"));
+      assertEquals(convertedNodeMetadata.getPublicAddresses(), ImmutableSet.of("67.23.10.132", "67.23.10.131",
+              "::babe:4317:0A83", "::babe:67.23.10.132"));
 
       assertNotNull(convertedNodeMetadata.getUserMetadata());
       assertEquals(convertedNodeMetadata.getUserMetadata(),
