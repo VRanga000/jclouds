@@ -122,18 +122,16 @@ public class ServerInRegionToNodeMetadata implements Function<ServerInRegion, No
       }
 
       builder.publicAddresses(
-            filter(
                   transform(
-                        filter(addresses, not(isPrivateAddress)),
-                        AddressToStringTransformationFunction.INSTANCE),
-                  isInet4Address));
+                          filter(addresses, not(isPrivateAddress)),
+                          AddressToStringTransformationFunction.INSTANCE)
+                  );
 
       builder.privateAddresses(
-            filter(
                   transform(
-                        filter(addresses, isPrivateAddress),
-                        AddressToStringTransformationFunction.INSTANCE),
-                  isInet4Address));
+                          filter(addresses, isPrivateAddress),
+                          AddressToStringTransformationFunction.INSTANCE)
+                  );
 
       for (Link link : from.getLinks()) {
          if (link.getRelation().equals(Link.Relation.SELF)) {
