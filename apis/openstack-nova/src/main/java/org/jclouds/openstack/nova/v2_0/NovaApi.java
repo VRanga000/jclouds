@@ -16,9 +16,8 @@
  */
 package org.jclouds.openstack.nova.v2_0;
 
-import java.io.Closeable;
-import java.util.Set;
-
+import com.google.common.base.Optional;
+import com.google.inject.Provides;
 import org.jclouds.location.Region;
 import org.jclouds.location.functions.RegionToEndpoint;
 import org.jclouds.openstack.nova.v2_0.extensions.AttachInterfaceApi;
@@ -33,6 +32,7 @@ import org.jclouds.openstack.nova.v2_0.extensions.KeyPairApi;
 import org.jclouds.openstack.nova.v2_0.extensions.QuotaApi;
 import org.jclouds.openstack.nova.v2_0.extensions.SecurityGroupApi;
 import org.jclouds.openstack.nova.v2_0.extensions.ServerAdminApi;
+import org.jclouds.openstack.nova.v2_0.extensions.ServerGroupApi;
 import org.jclouds.openstack.nova.v2_0.extensions.ServerWithSecurityGroupsApi;
 import org.jclouds.openstack.nova.v2_0.extensions.SimpleTenantUsageApi;
 import org.jclouds.openstack.nova.v2_0.extensions.VirtualInterfaceApi;
@@ -46,8 +46,8 @@ import org.jclouds.openstack.v2_0.features.ExtensionApi;
 import org.jclouds.rest.annotations.Delegate;
 import org.jclouds.rest.annotations.EndpointParam;
 
-import com.google.common.base.Optional;
-import com.google.inject.Provides;
+import java.io.Closeable;
+import java.util.Set;
 
 /**
  * Provides access to the OpenStack Compute (Nova) v2 API.
@@ -281,7 +281,18 @@ public interface NovaApi extends Closeable {
    Optional<AttachInterfaceApi> getAttachInterfaceApi(
          @EndpointParam(parser = RegionToEndpoint.class) String region);
 
-   /**
+    /**
+     * Provides access to Server Group features.
+     *
+     * <h3>NOTE</h3>
+     * This API is an extension that may or may not be present in your OpenStack cloud. Use the Optional return type
+     * to determine if it is present.
+     */
+    @Delegate
+    Optional<ServerGroupApi> getServerGroupApi(
+            @EndpointParam(parser = RegionToEndpoint.class) String region);
+
+    /**
     * @return the Zone codes configured
     * @deprecated Please use {@link #getConfiguredRegions()} instead. To be removed in jclouds 2.0.
     */
@@ -460,4 +471,5 @@ public interface NovaApi extends Closeable {
    @Delegate
    Optional<? extends ConsolesApi> getConsolesExtensionForZone(
          @EndpointParam(parser = RegionToEndpoint.class) String zone);
+
 }

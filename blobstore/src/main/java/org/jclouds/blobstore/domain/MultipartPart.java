@@ -14,30 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.chef.config;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package org.jclouds.blobstore.domain;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.google.auto.value.AutoValue;
 
-import javax.inject.Qualifier;
+@AutoValue
+public abstract class MultipartPart {
+   public abstract int partNumber();
+   public abstract long partSize();
+   public abstract String partETag();
 
-/**
- * Used to configure the cookbook Json parser.
- * <p>
- * Chef Server version 0.9 and 0.10 return a different Json when rquesting the
- * cookbook definitions. This annotation can be used to setup the cookbook
- * parser.
- * @deprecated Support for Chef 0.9 and 0.10 will be removed in upcoming versions.
- */
-@Target({ METHOD, PARAMETER, FIELD })
-@Retention(RUNTIME)
-@Qualifier
-@Deprecated
-public @interface CookbookParser {
-
+   public static MultipartPart create(int partNumber, long partSize, String partETag) {
+      return new AutoValue_MultipartPart(partNumber, partSize, partETag);
+   }
 }
