@@ -305,8 +305,8 @@
             "description": "Attach interface support."
         },
         {
-          "updated": "2012-06-21T00:00:00Z",
-          "name": "Hypervisors",
+          "updated": "2015-05-11T00:00:00+00:00",
+          "name": "ServerGroups",
           "links": [],
           "namespace": "http://docs.openstack.org/compute/ext/hypervisors/api/v1.1",
           "alias": "os-hypervisors",
