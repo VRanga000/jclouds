@@ -35,6 +35,9 @@ import javax.inject.Named;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.openstack.nova.v2_0.domain.BlockDeviceMapping;
 import org.jclouds.openstack.nova.v2_0.domain.Network;
+import org.jclouds.openstack.nova.v2_0.domain.SchedulerHints;
+import org.jclouds.openstack.nova.v2_0.domain.SchedulerHints.*;
+
 import org.jclouds.rest.MapBinder;
 import org.jclouds.rest.binders.BindToJsonPayload;
 
@@ -49,6 +52,12 @@ import com.google.common.collect.Sets;
 public class CreateServerOptions implements MapBinder {
    @Inject
    private BindToJsonPayload jsonBinder;
+
+
+
+   public CreateServerOptions() {
+      super();
+   }
 
    static class File {
       private final String path;
@@ -108,6 +117,7 @@ public class CreateServerOptions implements MapBinder {
    private Set<String> networks = ImmutableSet.of();
    private Set<Network> novaNetworks = ImmutableSet.of();
    private String availabilityZone;
+   private String serverGroup = null;
    private boolean configDrive;
    private Set<BlockDeviceMapping> blockDeviceMappings = ImmutableSet.of();
    private SchedulerHints schedulerHints;
@@ -253,7 +263,7 @@ public class CreateServerOptions implements MapBinder {
       }
 
       if(serverGroup != null) {
-        SchedulerHints schedulerHints = SchedulerHints.Builder().serverGroup(serverGroup);
+        SchedulerHints schedulerHints = SchedulerHints.builder().serverGroup(serverGroup).build();
         return bindToRequest(request, ImmutableMap.of("server", server, "os: scheduler_hints", schedulerHints));
       }
       else {
@@ -420,6 +430,11 @@ public class CreateServerOptions implements MapBinder {
     */
    public CreateServerOptions blockDeviceMappings(Set<BlockDeviceMapping> blockDeviceMappings) {
       this.blockDeviceMappings = ImmutableSet.copyOf(blockDeviceMappings);
+      return this;
+   }
+   public CreateServerOptions schedulerHints(SchedulerHints schedulerHints) {
+
+      this.schedulerHints = schedulerHints;
       return this;
    }
 
