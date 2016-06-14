@@ -169,7 +169,7 @@ public class CreateServerOptions implements MapBinder {
       toString.add("configDrive", configDrive);
       if (!blockDeviceMappings.isEmpty())
          toString.add("blockDeviceMappings", blockDeviceMappings);
-      if(schedulerHints != null) {
+      if (schedulerHints != null) {
         toString.add("schedulerHints", schedulerHints);
       }
       return toString;
@@ -432,8 +432,12 @@ public class CreateServerOptions implements MapBinder {
       this.blockDeviceMappings = ImmutableSet.copyOf(blockDeviceMappings);
       return this;
    }
+  
+   /**
+     * Scheduler hints for server creation request
+     * @see http://developer.openstack.org/api-ref-compute-v2-ext.html#createServer
+    */
    public CreateServerOptions schedulerHints(SchedulerHints schedulerHints) {
-
       this.schedulerHints = schedulerHints;
       return this;
    }
