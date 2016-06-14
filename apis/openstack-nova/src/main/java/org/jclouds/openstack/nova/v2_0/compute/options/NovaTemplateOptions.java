@@ -28,6 +28,7 @@ import java.util.Set;
 import org.jclouds.compute.options.TemplateOptions;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.openstack.nova.v2_0.domain.Network;
+import org.jclouds.openstack.nova.v2_0.domain.SchedulerHints;
 import org.jclouds.scriptbuilder.domain.Statement;
 
 import com.google.common.base.Objects;
@@ -113,7 +114,7 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    @Override
    public int hashCode() {
       return Objects.hashCode(super.hashCode(), autoAssignFloatingIp, floatingIpPoolNames, generateKeyPair, keyPairName, 
-              Arrays.hashCode(userData), diskConfig, configDrive, novaNetworks, availabilityZone);
+              userData, diskConfig, configDrive, novaNetworks, availabilityZone, schedulerHints);
    }
 
    @Override
@@ -131,6 +132,9 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
       toString.add("configDrive", configDrive);
       toString.add("novaNetworks", novaNetworks);
       toString.add("availabilityZone", availabilityZone);
+       if (schedulerHints.isPresent()) {
+           toString.add("schedulerHints", schedulerHints.get());
+       }
       return toString;
    }
 
