@@ -117,8 +117,8 @@ public class CreateServerOptions implements MapBinder {
    private Set<String> networks = ImmutableSet.of();
    private Set<Network> novaNetworks = ImmutableSet.of();
    private String availabilityZone;
-   private String serverGroup = null;
    private boolean configDrive;
+   private String serverGroup = null;
    private Set<BlockDeviceMapping> blockDeviceMappings = ImmutableSet.of();
    private SchedulerHints schedulerHints;
 
