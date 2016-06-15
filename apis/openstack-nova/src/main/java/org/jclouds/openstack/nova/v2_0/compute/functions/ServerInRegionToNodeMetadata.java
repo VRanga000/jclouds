@@ -18,9 +18,7 @@ package org.jclouds.openstack.nova.v2_0.compute.functions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.not;
-import static com.google.common.base.Predicates.or;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Iterables.transform;
@@ -39,7 +37,6 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.google.common.base.Optional;
 import org.jclouds.collect.Memoized;
 import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.Hardware;
@@ -125,18 +122,19 @@ public class ServerInRegionToNodeMetadata implements Function<ServerInRegion, No
       }
 
       builder.publicAddresses(
-            filter(
+
                   transform(
-                        filter(addresses, or(isFloatingAddress, not(isPrivateAddress))),
-                        AddressToStringTransformationFunction.INSTANCE),
-                  isInet4Address));
+                          filter(addresses, not(isPrivateAddress)),
+                          AddressToStringTransformationFunction.INSTANCE)
+
+      );
 
       builder.privateAddresses(
-            filter(
+
                   transform(
-                        filter(addresses, and(not(isFloatingAddress), isPrivateAddress)),
-                        AddressToStringTransformationFunction.INSTANCE),
-                  isInet4Address));
+                          filter(addresses, isPrivateAddress),
+                          AddressToStringTransformationFunction.INSTANCE)
+                  );
 
       for (Link link : from.getLinks()) {
          if (link.getRelation().equals(Link.Relation.SELF)) {
@@ -147,14 +145,7 @@ public class ServerInRegionToNodeMetadata implements Function<ServerInRegion, No
       return builder.build();
    }
 
-   public static final Predicate<Address> isFloatingAddress = new Predicate<Address>() {
-      public boolean apply(Address in) {
-         final Optional<String> addrType = in.getType();
-         return addrType.isPresent() && "floating".equals(addrType.get());
-      }
-   };
-
-   public static final Predicate<Address> isPrivateAddress = new Predicate<Address>() {
+   private static final Predicate<Address> isPrivateAddress = new Predicate<Address>() {
       public boolean apply(Address in) {
          return InetAddresses2.IsPrivateIPAddress.INSTANCE.apply(in.getAddr());
       }
@@ -174,7 +165,7 @@ public class ServerInRegionToNodeMetadata implements Function<ServerInRegion, No
 
    };
 
-   public enum AddressToStringTransformationFunction implements Function<Address, String> {
+   private enum AddressToStringTransformationFunction implements Function<Address, String> {
       INSTANCE;
       @Override
       public String apply(Address address) {

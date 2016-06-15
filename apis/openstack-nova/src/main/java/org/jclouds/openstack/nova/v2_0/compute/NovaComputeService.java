@@ -102,7 +102,7 @@ public class NovaComputeService extends BaseComputeService {
       }
    }
 
-   /**
+  /**
     * returns template options, except of type {@link NovaTemplateOptions}.
     */
    @Override

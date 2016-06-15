@@ -26,7 +26,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jclouds.compute.options.TemplateOptions;
+import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.domain.LoginCredentials;
+import org.jclouds.logging.Logger;
 import org.jclouds.openstack.nova.v2_0.domain.Network;
 import org.jclouds.openstack.nova.v2_0.domain.SchedulerHints;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -35,6 +37,9 @@ import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+
+import javax.annotation.Resource;
+import javax.inject.Named;
 
 /**
  * Contains options supported in the {@code ComputeService#runNode} operation on the
@@ -51,7 +56,11 @@ import com.google.common.collect.ImmutableSet;
  * <code>
  */
 public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
-   @Override
+    @Resource
+    @Named(ComputeServiceConstants.COMPUTE_LOGGER)
+    protected Logger logger = Logger.NULL;
+
+    @Override
    public NovaTemplateOptions clone() {
       NovaTemplateOptions options = new NovaTemplateOptions();
       copyTo(options);
@@ -80,6 +89,10 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
          eTo.configDrive(getConfigDrive());
          eTo.novaNetworks(getNovaNetworks());
          eTo.availabilityZone(getAvailabilityZone());
+
+          if (getSchedulerHints().isPresent()) {
+              eTo.schedulerHints(getSchedulerHints().get());
+          }
       }
    }
 
@@ -92,7 +105,7 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    protected boolean configDrive;
    protected Set<Network> novaNetworks;
    protected String availabilityZone;
-   protected Optional<SchedulerHints> schedulerHints = Optional.absent();
+   private Optional<SchedulerHints> schedulerHints = Optional.absent();
 
    @Override
    public boolean equals(Object o) {
@@ -134,9 +147,9 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
       toString.add("configDrive", configDrive);
       toString.add("novaNetworks", novaNetworks);
       toString.add("availabilityZone", availabilityZone);
-       if (schedulerHints.isPresent()) {
-           toString.add("schedulerHints", schedulerHints.get());
-       }
+      if (schedulerHints.isPresent()) {
+        toString.add("schedulerHints", schedulerHints.get());
+      }
       return toString;
    }
 
@@ -226,6 +239,14 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    }
 
    /**
+    * @see CreateServerOptions#getSchedulerHints()
+    */
+   public NovaTemplateOptions schedulerHints(SchedulerHints schedulerHints) {
+      this.schedulerHints = Optional.of(schedulerHints);
+      return this;
+   }
+
+   /**
     * The floating IP pool name(s) to use when allocating a FloatingIP. Applicable
     * only if #shouldAutoAssignFloatingIp() returns true. If not set will attempt to
     * use whatever FloatingIP(s) can be found regardless of which pool they originated
@@ -299,6 +320,10 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
     */
    public String getAvailabilityZone() {
       return availabilityZone;
+   }
+
+   public Optional<SchedulerHints> getSchedulerHints() {
+      return schedulerHints;
    }
 
    public static class Builder {
@@ -501,6 +526,15 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
          NovaTemplateOptions options = new NovaTemplateOptions();
          return options.availabilityZone(availabilityZone);
       }
+
+      /**
+       * @see NovaTemplateOptions#getSchedulerHints()
+       */
+      public static NovaTemplateOptions schedulerHints(SchedulerHints schedulerHints) {
+         NovaTemplateOptions options = new NovaTemplateOptions();
+         return options.schedulerHints(schedulerHints);
+      }
+
    }
 
    // methods that only facilitate returning the correct object type
