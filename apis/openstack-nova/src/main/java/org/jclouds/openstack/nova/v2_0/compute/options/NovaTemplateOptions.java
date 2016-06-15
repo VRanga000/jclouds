@@ -92,6 +92,7 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    protected boolean configDrive;
    protected Set<Network> novaNetworks;
    protected String availabilityZone;
+   protected Optional<SchedulerHints> schedulerHints = Optional.absent();
 
    @Override
    public boolean equals(Object o) {
@@ -112,8 +113,9 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    }
 
    @Override
+   @SuppressWarnings("ArrayHashCode")
    public int hashCode() {
-      return Objects.hashCode(super.hashCode(), autoAssignFloatingIp, floatingIpPoolNames, generateKeyPair, keyPairName, 
+      return Objects.hashCode(super.hashCode(), autoAssignFloatingIp, floatingIpPoolNames, generateKeyPair, keyPairName,
               userData, diskConfig, configDrive, novaNetworks, availabilityZone, schedulerHints);
    }
 
